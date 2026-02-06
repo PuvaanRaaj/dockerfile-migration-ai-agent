@@ -72,6 +72,26 @@ Makefile shortcuts:
 make setup
 make agent TARGET=/path/to/Dockerfile TASK="Migrate to PHP 8.3 multiarch format"
 make validate-knowledge
+make launcher
+make install-cli
+```
+
+Interactive launcher:
+
+```bash
+./bin/dockermigration-agent
+```
+
+Global command (after `make install-cli`):
+
+```bash
+dockermigration-agent
+```
+
+macOS double-click launcher:
+
+```bash
+./dockermigration-agent.command
 ```
 
 Command cheat sheet:
@@ -116,6 +136,9 @@ Command cheat sheet:
 
 # Disable spinner
 ./bin/agent --target /path/to/Dockerfile --task "Your task" --mode propose --no-spinner
+
+# Open launcher menu (wizard + validation shortcuts)
+./bin/dockermigration-agent
 ```
 
 List available reference groups:
