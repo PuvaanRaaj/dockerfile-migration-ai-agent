@@ -82,6 +82,13 @@ Interactive launcher:
 ./bin/dockermigration-agent
 ```
 
+The launcher now opens a full-screen TUI (keyboard-friendly) with:
+- guided migration form inputs
+- live logs panel (markdown-aware rendering for headings/lists/status lines)
+- job history panel (status, duration, target)
+- reply box for interactive follow-ups (`Send Reply` button or `ctrl+s`)
+- action shortcuts (`ctrl+r` run, `ctrl+l` clear logs, `ctrl+h` clear history, `q` quit)
+
 Global command (after `make install-cli`):
 
 ```bash
@@ -248,6 +255,7 @@ If you want less context in follow-ups, lower the tail size:
 - Related files are expected to be returned in code blocks labeled like `file: path/to/file`.
 - `--output` writes only the Dockerfile; use `--write` to emit related files too.
 - Related file discovery is based on `COPY`/`ADD` statements in the target Dockerfile.
+- When related-file discovery is enabled, nearby `.gitlab-ci.yml`/`.gitlab-ci.yaml` files are also injected into context.
 - If your task specifies a PHP version, the agent will honor it even if the references are on a different PHP version.
 - UI mode (colors + spinner) is enabled automatically when stdout is a TTY. Disable with `--no-ui` or `NO_COLOR=1`.
 

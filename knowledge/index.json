@@ -2,7 +2,8 @@
   "version": 1,
   "global_reference_globs": [
     "knowledge/global/rules.md",
-    "knowledge/global/response-format.md"
+    "knowledge/global/response-format.md",
+    "knowledge/global/gitlab-ci-multiarch-reference.yml"
   ],
   "bundles": [
     {"manifest": "knowledge/bundles/golden-alpine/bundle.json"},

@@ -55,6 +55,7 @@ def build_user_prompt(
     else:
         lines.append("- No PHP version detected. Ask if a specific version is required before changing it.")
     lines.append("- Update related config files when they are part of the image.")
+    lines.append("- If `.gitlab-ci.yml` is present and the task is multi-arch, align CI jobs/stages with the CI reference.")
     if related_files:
         lines.append("")
         lines.append("Related files to review/update:")
@@ -68,6 +69,28 @@ def build_user_prompt(
         lines.append("If you update a binary asset version, state the filename to copy.")
     lines.append("- Keep changes minimal and aligned with the references.")
     return "\n".join(lines)
+
+
+def discover_ci_files(target_path: Path, max_parent_levels: int = 4) -> List[Path]:
+    ci_files: List[Path] = []
+    seen: set[Path] = set()
+
+    current = target_path.parent if target_path.is_file() else target_path
+    for _ in range(max_parent_levels + 1):
+        for name in (".gitlab-ci.yml", ".gitlab-ci.yaml"):
+            candidate = current / name
+            if not candidate.exists() or not candidate.is_file():
+                continue
+            resolved = candidate.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            ci_files.append(candidate)
+        if current.parent == current:
+            break
+        current = current.parent
+
+    return ci_files
 
 
 async def run_agent(
@@ -436,6 +459,15 @@ def main() -> None:
 
     related_files = [item.path for item in related_result.files] if related_result else []
     binary_files = related_result.binary_files if related_result else []
+    if not args.no_related:
+        known_paths = {path.resolve() for path in related_files if path.exists()}
+        for ci_file in discover_ci_files(target_path):
+            resolved = ci_file.resolve()
+            if resolved in known_paths:
+                continue
+            related_files.append(ci_file)
+            known_paths.add(resolved)
+            print(f"[related] CI config added: {ci_file}")
     user_prompt = build_user_prompt(
         target_path,
         args.task,
@@ -502,10 +534,13 @@ def main() -> None:
     write_outputs(response_text)
 
     if args.interactive:
+        print("\n[interactive] Follow-up mode enabled. Press enter on empty input to finish.")
         last_response = response_text
         while True:
-            followup = input("\nFollow-up (press enter to finish): ").strip()
+            print("[interactive] Awaiting follow-up input...")
+            followup = input("> ").strip()
             if not followup:
+                print("[interactive] Session finished.")
                 break
             context = trim_text(last_response, args.followup_context_chars)
             followup_prompt = (

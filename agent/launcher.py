@@ -260,6 +260,14 @@ def main() -> int:
     if passthrough:
         return run_agent(passthrough, title="Direct Agent Run")
 
+    try:
+        from agent.textual_launcher import run as run_textual_launcher
+    except ModuleNotFoundError:
+        run_textual_launcher = None
+
+    if run_textual_launcher is not None:
+        return run_textual_launcher()
+
     return run_launcher()
 
 

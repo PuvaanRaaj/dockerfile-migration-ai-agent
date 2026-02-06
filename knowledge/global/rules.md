@@ -8,3 +8,10 @@
 6. Never include binary file contents in responses.
 7. Prefer minimal diffs and backward-compatible changes unless user requests cleanup.
 8. Keep multi-arch logic explicit and deterministic.
+9. If `.gitlab-ci.yml` exists, enforce multi-arch pipeline shape from `gitlab-ci-multiarch-reference.yml`.
+10. For GitLab CI migration, keep these required jobs:
+   - `build` extends `.build_and_push_multiarch`
+   - `grype_scan/amd64` extends `.grype_scan_multiarch`
+   - `grype_scan/arm64` extends `.grype_scan_multiarch` with `GRYPE_SCAN_PLATFORM: linux/arm64`
+   - `create_image_tag_issue_notification` with `SCRIPT_NAME: core/scripts/create-issue-notification.sh`
+11. For GitLab CI migration, stages must include `build`, `security`, `production`.
