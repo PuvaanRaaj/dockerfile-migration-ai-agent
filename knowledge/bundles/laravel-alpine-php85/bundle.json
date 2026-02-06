@@ -1,0 +1,29 @@
+{
+  "id": "laravel-alpine-php85",
+  "name": "Laravel PHP 8.5 (Alpine)",
+  "description": "Laravel alpine stack with nginx, php-fpm, supervisor and local New Relic conventions.",
+  "priority": 92,
+  "stack": "laravel",
+  "base_os": "alpine",
+  "php_tag": "php85",
+  "tags": ["laravel", "alpine", "php85"],
+  "reference_globs": [
+    "knowledge/sources/laravel-alpine-php85/Dockerfile",
+    "knowledge/sources/laravel-alpine-php85/core/**/*.sh",
+    "knowledge/sources/laravel-alpine-php85/core/**/*.conf",
+    "knowledge/sources/laravel-alpine-php85/core/**/*.ini",
+    "knowledge/sources/laravel-alpine-php85/core/php.ini",
+    "knowledge/sources/laravel-alpine-php85/core/www.conf",
+    "knowledge/sources/laravel-alpine-php85/core/.bashrc",
+    "knowledge/sources/laravel-alpine-php85/core/newrelic/newrelic.ini.template"
+  ],
+  "asset_globs": [
+    "knowledge/sources/laravel-alpine-php85/core/newrelic/newrelic-php5-*.tar.gz"
+  ],
+  "applies_to": {
+    "path_patterns": [
+      "**/laravel/**/Dockerfile",
+      "**/service_api/**/Dockerfile"
+    ]
+  }
+}

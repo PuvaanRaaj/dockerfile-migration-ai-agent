@@ -1,0 +1,13 @@
+# /etc/bashrc: executed by bash(1) for non-login shells.
+
+export PS1="\[$(tput bold)\]\[$(tput setaf 6)\]\t \d\n\[$(tput setaf 2)\][\[$(tput setaf 3)\]\u\[$(tput setaf 1)\]@\[$(tput setaf 3)\]\h \[$(tput setaf 6)\]\w\[$(tput setaf 2)\]]\[$(tput setaf 4)\]\\$ \[$(tput sgr0)\]"
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias ls='ls --color --group-directories-first -F'
+alias ll='ls --color --group-directories-first -lhA'
+alias j='joe -nobackups -tab 4 -indentc 32 -istep 2'
+alias tf='tail -f'
+alias rscon='/sbin/restorecon -v'
+alias log='cd /var/log'

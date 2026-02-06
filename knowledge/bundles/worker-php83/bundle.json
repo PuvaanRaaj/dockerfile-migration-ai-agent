@@ -1,0 +1,28 @@
+{
+  "id": "worker-php83",
+  "name": "Worker PHP 8.3 (Alpine)",
+  "description": "Gearman worker baseline, PHP 8.3 extensions, supervisor and entrypoint patterns.",
+  "priority": 95,
+  "stack": "worker",
+  "base_os": "alpine",
+  "php_tag": "php83",
+  "tags": ["worker", "gearman", "alpine", "php83"],
+  "reference_globs": [
+    "knowledge/sources/worker-php83/base-image/Dockerfile",
+    "knowledge/sources/worker-php83/base-image/core/**/*.sh",
+    "knowledge/sources/worker-php83/base-image/core/**/*.conf",
+    "knowledge/sources/worker-php83/base-image/core/**/*.ini",
+    "knowledge/sources/worker-php83/base-image/core/php/php.ini",
+    "knowledge/sources/worker-php83/base-image/core/newrelic/newrelic.ini.template"
+  ],
+  "asset_globs": [
+    "knowledge/sources/worker-php83/base-image/core/newrelic/newrelic-php5-*.tar.gz"
+  ],
+  "applies_to": {
+    "path_patterns": [
+      "**/worker/**/Dockerfile",
+      "**/gearman/**/Dockerfile",
+      "**/base-image/Dockerfile"
+    ]
+  }
+}

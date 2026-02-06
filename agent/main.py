@@ -214,7 +214,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--knowledge-index",
-        help="Override knowledge index path (default: KNOWLEDGE_INDEX_PATH or knowledge/index.yaml)",
+        help="Override knowledge index path (default: KNOWLEDGE_INDEX_PATH or knowledge/index.json)",
     )
     parser.add_argument(
         "--list-reference-groups",
@@ -285,9 +285,6 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     load_dotenv()
-
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        raise SystemExit("ANTHROPIC_API_KEY is not set. Add it to .env or your shell environment.")
 
     args = parse_args()
     ui_enabled = args.ui if args.ui is not None else sys.stdout.isatty()
@@ -429,6 +426,9 @@ def main() -> None:
     if args.print_system_prompt:
         print(system_prompt)
         return
+
+    if not os.getenv("ANTHROPIC_API_KEY"):
+        raise SystemExit("ANTHROPIC_API_KEY is not set. Add it to .env or your shell environment.")
 
     allowed_tools = ["Read"]
     if args.mode == "apply":

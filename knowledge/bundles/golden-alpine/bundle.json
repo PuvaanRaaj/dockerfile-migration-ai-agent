@@ -8,11 +8,11 @@
   "php_tag": null,
   "tags": ["golden", "alpine"],
   "reference_globs": [
-    "golden-images/alpine/Dockerfile",
-    "golden-images/alpine/etc/**/*.sh",
-    "golden-images/alpine/etc/**/*.conf",
-    "golden-images/alpine/etc/**/*.cf",
-    "golden-images/alpine/etc/bashrc"
+    "knowledge/sources/golden-images/alpine/Dockerfile",
+    "knowledge/sources/golden-images/alpine/etc/**/*.sh",
+    "knowledge/sources/golden-images/alpine/etc/**/*.conf",
+    "knowledge/sources/golden-images/alpine/etc/**/*.cf",
+    "knowledge/sources/golden-images/alpine/etc/bashrc"
   ],
   "asset_globs": [],
   "applies_to": {

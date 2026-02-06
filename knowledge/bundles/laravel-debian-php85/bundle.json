@@ -1,0 +1,26 @@
+{
+  "id": "laravel-debian-php85",
+  "name": "Laravel PHP 8.5 (Debian)",
+  "description": "Laravel debian stack with apache/php-fpm/supervisor and local New Relic conventions.",
+  "priority": 92,
+  "stack": "laravel",
+  "base_os": "debian",
+  "php_tag": "php85",
+  "tags": ["laravel", "debian", "php85"],
+  "reference_globs": [
+    "knowledge/sources/laravel-debian-php85/base-image/Dockerfile",
+    "knowledge/sources/laravel-debian-php85/base-image/core/**/*.sh",
+    "knowledge/sources/laravel-debian-php85/base-image/core/**/*.conf",
+    "knowledge/sources/laravel-debian-php85/base-image/core/**/*.ini",
+    "knowledge/sources/laravel-debian-php85/base-image/core/**/*.template"
+  ],
+  "asset_globs": [
+    "knowledge/sources/laravel-debian-php85/base-image/core/newrelic/newrelic-php5-*.tar.gz"
+  ],
+  "applies_to": {
+    "path_patterns": [
+      "**/laravel/**/Dockerfile",
+      "**/service_api/**/Dockerfile"
+    ]
+  }
+}

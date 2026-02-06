@@ -1,0 +1,93 @@
+stages:
+  - build
+  - security
+  - push
+
+
+before_script:
+  - echo $CI_REGISTRY_PASSWORD | docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+
+
+MR Build:
+  stage: build
+  script:
+    # fetches the latest image (not failing if image is not found)
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
+    - docker build --build-arg CI_REGISTRY=$CI_REGISTRY --build-arg IMAGE_VERSION=${IMAGE_VERSION} --cache-from $CI_REGISTRY_IMAGE:latest -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA" .
+  tags:
+    - shell
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+
+grype-scan:
+  stage: security
+  before_script:
+    - echo "Grype Scan (before_script)"
+  script:
+    - echo "Grype Scan Running..."
+    - grype --fail-on medium "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"      
+  tags:
+    - shell
+  needs: ["MR Build"]
+  dependencies:
+    - "MR Build"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  allow_failure: true
+
+
+Build:
+  stage: build
+  variables:
+    CI_APPLICATION_TAG: "${MajorVersion}.${MinorVersion}.${CI_JOB_ID}"
+  script:
+    - echo "CI_APPLICATION_TAG=$CI_APPLICATION_TAG" >> build.env
+    # fetches the latest image (not failing if image is not found)
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
+    - docker build --build-arg CI_REGISTRY=$CI_REGISTRY --build-arg IMAGE_VERSION=${IMAGE_VERSION} --cache-from $CI_REGISTRY_IMAGE:latest -t "$CI_REGISTRY_IMAGE:$CI_APPLICATION_TAG" .
+  tags:
+    - shell
+  only:
+    - main
+  artifacts:
+    reports:
+      dotenv: build.env
+
+
+Push:
+  variables:
+    # Again, we do not need the source code here. Just playing with Docker.
+    GIT_STRATEGY: none
+  stage: push
+  script:
+    - docker push $CI_REGISTRY_IMAGE:$CI_APPLICATION_TAG
+  tags:
+    - shell
+  dependencies:
+    - "Build"
+  only:
+    - main
+  needs:
+    - "Build"
+
+
+Push latest:
+  variables:
+    # Again, we do not need the source code here. Just playing with Docker.
+    GIT_STRATEGY: none
+  stage: push
+  script:
+    - docker tag $CI_REGISTRY_IMAGE:$CI_APPLICATION_TAG $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:latest
+  tags:
+    - shell
+  dependencies:
+    - "Build"
+  only:
+    - main
+  needs:
+    - "Build"
+
+
+

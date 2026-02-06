@@ -7,7 +7,7 @@ from pathlib import Path
 class AgentConfig:
     repo_root: Path = Path(__file__).resolve().parents[1]
     knowledge_index_path: Path = Path(
-        os.getenv("KNOWLEDGE_INDEX_PATH", "knowledge/index.yaml")
+        os.getenv("KNOWLEDGE_INDEX_PATH", "knowledge/index.json")
     )
     max_reference_chars_total: int = int(
         os.getenv("MAX_REFERENCE_CHARS_TOTAL", "60000")

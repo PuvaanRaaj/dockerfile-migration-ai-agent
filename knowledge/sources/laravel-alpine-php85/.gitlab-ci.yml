@@ -1,0 +1,40 @@
+stages:
+  - build # from server.base-image.yml
+  - security # from server.base-image.yml
+  - production # from server.base-image.yml
+
+# Include all the modular YML files
+include:
+  - project: "server/yml"
+    ref: "main"
+    file: "server.base-image.yml"
+  - project: "server/yml"
+    ref: "main"
+    file: "backend.test.yml"
+
+# Stage: build
+
+build:
+  extends: .build_and_push_multiarch
+
+# Stage: security
+
+grype_scan/amd64:
+  extends: .grype_scan_multiarch
+
+grype_scan/arm64:
+  extends: .grype_scan_multiarch
+  needs:
+    - build
+    - grype_scan/amd64
+  variables:
+    GRYPE_SCAN_PLATFORM: "linux/arm64"
+
+# Stage: production
+
+create_image_tag_issue_notification:
+  extends: .create_image_tag_issue_notification
+  dependencies:
+    - build
+  variables:
+    SCRIPT_NAME: "core/scripts/create-issue-notification.sh"

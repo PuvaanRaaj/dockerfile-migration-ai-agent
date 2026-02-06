@@ -6,9 +6,10 @@ This project scaffolds a local agent that learns from your existing Dockerfile p
 
 The agent reads references from a unified knowledge base:
 
-- `knowledge/index.yaml`: top-level index and global references.
-- `knowledge/bundles/*/bundle.yaml`: bundle metadata (stack/base/php/tags/priority + globs).
+- `knowledge/index.json`: top-level index and global references.
+- `knowledge/bundles/*/bundle.json`: bundle metadata (stack/base/php/tags/priority + globs).
 - `knowledge/global/*.md`: global rules and response contracts.
+- `knowledge/sources/**`: local mirrored reference files used by bundle globs.
 
 Runtime selection is metadata-driven. The agent chooses bundle IDs from the index based on:
 - user task intent (`worker`, `laravel`, `php83`, `php84`, etc.)
@@ -21,16 +22,21 @@ You can still force bundle selection with `--reference-group`.
 
 ```text
 knowledge/
-  index.yaml
+  index.json
   global/
     rules.md
     response-format.md
+  sources/
+    golden-images/...
+    worker-php83/...
+    laravel-alpine-php85/...
+    laravel-debian-php85/...
   bundles/
-    golden-alpine/bundle.yaml
-    golden-debian/bundle.yaml
-    worker-php83/bundle.yaml
-    laravel-alpine-php85/bundle.yaml
-    laravel-debian-php85/bundle.yaml
+    golden-alpine/bundle.json
+    golden-debian/bundle.json
+    worker-php83/bundle.json
+    laravel-alpine-php85/bundle.json
+    laravel-debian-php85/bundle.json
 ```
 
 ## Setup
@@ -102,7 +108,7 @@ Command cheat sheet:
 ./bin/agent --wizard
 
 # Use custom knowledge index
-./bin/agent --knowledge-index /path/to/knowledge/index.yaml --target /path/to/Dockerfile --task "Your task" --mode propose
+./bin/agent --knowledge-index /path/to/knowledge/index.json --target /path/to/Dockerfile --task "Your task" --mode propose
 
 # UI styling and spinner (auto-enabled on TTY, disable with --no-ui)
 ./bin/agent --target /path/to/Dockerfile --task "Your task" --mode propose --ui
@@ -121,8 +127,8 @@ List available reference groups:
 Propose a migration (read-only):
 
 ```bash
-python -m agent \
-  --target worker-php83/base-image/Dockerfile \
+./bin/agent \
+  --target /path/to/Dockerfile \
   --task "Align with golden image patterns and keep local New Relic install" \
   --mode propose
 ```
@@ -130,8 +136,8 @@ python -m agent \
 If the base image cannot be inferred, pass `--base`:
 
 ```bash
-python -m agent \
-  --target laravel-debian-php85/base-image/Dockerfile \
+./bin/agent \
+  --target /path/to/Dockerfile \
   --task "Migrate to PHP 8.3 multiarch format" \
   --base debian \
   --mode propose
@@ -140,8 +146,8 @@ python -m agent \
 Write migrated files to `.migrated` paths (Dockerfile + any related files returned by the agent):
 
 ```bash
-python -m agent \
-  --target worker-php83/base-image/Dockerfile \
+./bin/agent \
+  --target /path/to/Dockerfile \
   --task "Align with golden image patterns and keep local New Relic install" \
   --mode propose \
   --write
@@ -150,8 +156,8 @@ python -m agent \
 Allow edits directly to the file:
 
 ```bash
-python -m agent \
-  --target worker-php83/base-image/Dockerfile \
+./bin/agent \
+  --target /path/to/Dockerfile \
   --task "Align with golden image patterns and keep local New Relic install" \
   --mode apply
 ```
@@ -159,8 +165,8 @@ python -m agent \
 Sync the latest New Relic tarball from references into the target repo (if present):
 
 ```bash
-python -m agent \
-  --target worker-php83/base-image/Dockerfile \
+./bin/agent \
+  --target /path/to/Dockerfile \
   --task "Update New Relic to latest local binary" \
   --mode propose \
   --sync-newrelic
@@ -172,8 +178,8 @@ The latest asset is chosen by version number and base (Alpine prefers `musl` bui
 Disable related file discovery:
 
 ```bash
-python -m agent \
-  --target worker-php83/base-image/Dockerfile \
+./bin/agent \
+  --target /path/to/Dockerfile \
   --task "Migrate to PHP 8.3 multiarch format" \
   --mode propose \
   --no-related
@@ -182,8 +188,8 @@ python -m agent \
 Enable debug logging (tool/event timing to stderr):
 
 ```bash
-python -m agent \
-  --target worker-php83/base-image/Dockerfile \
+./bin/agent \
+  --target /path/to/Dockerfile \
   --task "Migrate to PHP 8.3 multiarch format" \
   --mode propose \
   --debug
@@ -192,8 +198,8 @@ python -m agent \
 Enable interactive follow-ups:
 
 ```bash
-python -m agent \
-  --target worker-php83/base-image/Dockerfile \
+./bin/agent \
+  --target /path/to/Dockerfile \
   --task "Migrate to PHP 8.3 multiarch format" \
   --mode propose \
   --interactive
@@ -202,8 +208,8 @@ python -m agent \
 If you want less context in follow-ups, lower the tail size:
 
 ```bash
-python -m agent \
-  --target worker-php83/base-image/Dockerfile \
+./bin/agent \
+  --target /path/to/Dockerfile \
   --task "Migrate to PHP 8.3 multiarch format" \
   --mode propose \
   --interactive \

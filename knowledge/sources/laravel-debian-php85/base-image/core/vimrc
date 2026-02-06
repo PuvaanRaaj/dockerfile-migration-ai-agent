@@ -1,0 +1,8 @@
+" Disable mouse in vim so terminal can handle mouse selection/copy
+set mouse=
+
+" Basic usability settings
+set number
+set nocompatible
+set backspace=indent,eol,start
+syntax on

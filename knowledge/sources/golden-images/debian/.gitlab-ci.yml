@@ -1,0 +1,72 @@
+stages:
+  - build       # from server.base-image.yml
+  - test        # From backend.test.yml
+  - security    # from server.base-image.yml
+  - push        # from server.base-image.yml
+  - production  # from backend.production.yml
+
+# Include all the modular YML files
+include:
+- project: 'server/yml'
+  ref: 'main'
+  file: 'server.base-image.yml'
+- project: 'server/yml'
+  ref: 'main'
+  file: 'backend.test.yml'
+- project: 'server/yml'
+  ref: 'main'
+  file: 'backend.production.yml'
+
+# Stage: build
+
+build:
+  extends: .build
+  script:
+    - echo "Build Running..."
+    # Conditional logic to set CI_APPLICATION_TAG based on the branch
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "master" || "$CI_COMMIT_BRANCH" == "main" ]]; then
+        # Extract base image from Dockerfile
+        BASE_IMAGE=$(grep -i '^FROM' Dockerfile | head -n 1 | awk '{print $2}')
+        # Sanitize the base image (replace : with -, optionally / with _)
+        BASE_IMAGE_SANITIZED=${BASE_IMAGE//:/-}
+        BASE_IMAGE_SANITIZED=${BASE_IMAGE_SANITIZED//\//_}
+        # Compose the application tag
+        export CI_APPLICATION_TAG="${MajorVersion}.${MinorVersion}.${CI_JOB_ID}-${BASE_IMAGE_SANITIZED}"
+      else
+        export CI_APPLICATION_TAG="$CI_COMMIT_SHA"
+      fi
+    - echo "CI_APPLICATION_TAG=$CI_APPLICATION_TAG" > build.env
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
+    - docker build
+      --pull
+      --build-arg BUILDKIT_INLINE_CACHE=1
+      --cache-from=$CI_REGISTRY_IMAGE:latest
+      -t "$CI_REGISTRY_IMAGE:$CI_APPLICATION_TAG" .
+
+# # Stage: test
+
+deepcode:
+  extends: .deepcode
+
+# # Stage: security
+
+grype_scan:
+  extends: .grype_scan
+
+# # Stage: push
+
+push:
+  extends: .push
+
+push_latest:
+  extends: .push_latest
+
+# Stage: production
+
+update_image_tag:
+  extends: .update_image_tag
+  variables:
+    SCRIPT_NAME: "etc/scripts/update-variables.sh"
+  dependencies: 
+    - "build"

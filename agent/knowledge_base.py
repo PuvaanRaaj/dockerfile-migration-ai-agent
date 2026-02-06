@@ -1,8 +1,12 @@
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError:
+    yaml = None
 
 
 @dataclass(frozen=True)
@@ -42,9 +46,30 @@ def _as_list(value) -> List[str]:
     return [str(value)]
 
 
-def _load_bundle(repo_root: Path, manifest_path: Path) -> KnowledgeBundle:
-    with manifest_path.open("r", encoding="utf-8") as handle:
-        data = yaml.safe_load(handle) or {}
+def _load_document(path: Path):
+    text = path.read_text(encoding="utf-8")
+    suffix = path.suffix.lower()
+
+    if suffix == ".json":
+        return json.loads(text)
+
+    if suffix in {".yml", ".yaml"}:
+        if yaml is None:
+            raise ModuleNotFoundError(
+                f"PyYAML is required to parse {path}. Install it or switch to JSON manifests."
+            )
+        return yaml.safe_load(text)
+
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        if yaml is None:
+            raise ValueError(f"Unsupported knowledge format for {path}")
+        return yaml.safe_load(text)
+
+
+def _load_bundle(manifest_path: Path) -> KnowledgeBundle:
+    data = _load_document(manifest_path) or {}
 
     applies_to = data.get("applies_to") or {}
     return KnowledgeBundle(
@@ -64,8 +89,7 @@ def _load_bundle(repo_root: Path, manifest_path: Path) -> KnowledgeBundle:
 
 def load_knowledge_base(repo_root: Path, index_path: Path) -> KnowledgeBase:
     resolved_index = index_path if index_path.is_absolute() else repo_root / index_path
-    with resolved_index.open("r", encoding="utf-8") as handle:
-        index_data = yaml.safe_load(handle) or {}
+    index_data = _load_document(resolved_index) or {}
 
     manifests = index_data.get("bundles") or []
     bundles: List[KnowledgeBundle] = []
@@ -76,7 +100,7 @@ def load_knowledge_base(repo_root: Path, index_path: Path) -> KnowledgeBase:
         manifest_path = repo_root / str(manifest_rel)
         if not manifest_path.exists():
             raise FileNotFoundError(f"Knowledge manifest not found: {manifest_path}")
-        bundles.append(_load_bundle(repo_root, manifest_path))
+        bundles.append(_load_bundle(manifest_path))
 
     if not bundles:
         raise ValueError("No bundles found in knowledge index.")
