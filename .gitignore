@@ -1,0 +1,16 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+.envrc
+.secrets
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.migrated
+*.backup

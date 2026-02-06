@@ -1,0 +1,20 @@
+id: golden-alpine
+name: Golden Alpine Base
+description: Baseline Alpine conventions for system tools and dnsmasq/postfix setup.
+priority: 80
+stack: golden
+base_os: alpine
+php_tag:
+tags:
+  - golden
+  - alpine
+reference_globs:
+  - golden-images/alpine/Dockerfile
+  - golden-images/alpine/etc/**/*.sh
+  - golden-images/alpine/etc/**/*.conf
+  - golden-images/alpine/etc/**/*.cf
+  - golden-images/alpine/etc/bashrc
+asset_globs: []
+applies_to:
+  path_patterns:
+    - "**/Dockerfile"

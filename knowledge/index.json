@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "global_reference_globs": [
+    "knowledge/global/rules.md",
+    "knowledge/global/response-format.md"
+  ],
+  "bundles": [
+    {"manifest": "knowledge/bundles/golden-alpine/bundle.json"},
+    {"manifest": "knowledge/bundles/golden-debian/bundle.json"},
+    {"manifest": "knowledge/bundles/worker-php83/bundle.json"},
+    {"manifest": "knowledge/bundles/laravel-alpine-php85/bundle.json"},
+    {"manifest": "knowledge/bundles/laravel-debian-php85/bundle.json"}
+  ]
+}

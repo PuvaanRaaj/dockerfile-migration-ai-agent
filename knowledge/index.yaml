@@ -1,0 +1,10 @@
+version: 1
+global_reference_globs:
+  - knowledge/global/rules.md
+  - knowledge/global/response-format.md
+bundles:
+  - manifest: knowledge/bundles/golden-alpine/bundle.yaml
+  - manifest: knowledge/bundles/golden-debian/bundle.yaml
+  - manifest: knowledge/bundles/worker-php83/bundle.yaml
+  - manifest: knowledge/bundles/laravel-alpine-php85/bundle.yaml
+  - manifest: knowledge/bundles/laravel-debian-php85/bundle.yaml

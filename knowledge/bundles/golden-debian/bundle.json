@@ -1,0 +1,21 @@
+{
+  "id": "golden-debian",
+  "name": "Golden Debian Base",
+  "description": "Baseline Debian conventions for system tools and dnsmasq/postfix setup.",
+  "priority": 80,
+  "stack": "golden",
+  "base_os": "debian",
+  "php_tag": null,
+  "tags": ["golden", "debian"],
+  "reference_globs": [
+    "golden-images/debian/Dockerfile",
+    "golden-images/debian/etc/**/*.sh",
+    "golden-images/debian/etc/**/*.conf",
+    "golden-images/debian/etc/**/*.cf",
+    "golden-images/debian/etc/bashrc"
+  ],
+  "asset_globs": [],
+  "applies_to": {
+    "path_patterns": ["**/Dockerfile"]
+  }
+}
